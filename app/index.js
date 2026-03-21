@@ -1,11 +1,13 @@
 // app/index.js
 import React from 'react';
-import { StyleSheet, SafeAreaView } from 'react-native';
+import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Header from './components/Header';
-import MainMenu from './components/MainMenu';
-import DailyContent from './components/DailyContent';
-import PromotionsGrid from './components/PromotionsGrid';
+import Header from '../components/Header';
+import VoucherScanner from '../components/VoucherScanner';
+import CategoryMenu from '../components/CategoryMenu';
+import MainMenu from '../components/MainMenu';
+import DailyContent from '../components/DailyContent';
+import PromotionsGrid from '../components/PromotionsGrid';
 
 export default function HomeScreen() {
   return (
@@ -14,10 +16,14 @@ export default function HomeScreen() {
         colors={['#FF6B35', '#FF9F1C']}
         style={styles.gradient}
       >
-        <Header />
-        <DailyContent />
-        <MainMenu />
-        <PromotionsGrid />
+        <ScrollView showsVerticalScrollIndicator={false}>
+            <Header />
+            <VoucherScanner />
+            <CategoryMenu />
+            <DailyContent />
+            <MainMenu />
+            <PromotionsGrid />
+        </ScrollView>
       </LinearGradient>
     </SafeAreaView>
   );

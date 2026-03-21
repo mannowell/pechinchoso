@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Header() {
@@ -7,7 +7,11 @@ export default function Header() {
     <SafeAreaView edges={['top']} style={styles.header}>
       <View style={styles.logoContainer}>
         <View style={styles.logo}>
-          <Text style={styles.logoIcon}>🛍️</Text>
+          <Image 
+            source={require('../assets/icon.png')} 
+            style={styles.logoImage} 
+            resizeMode="contain"
+          />
         </View>
         <Text style={styles.title}>Pechinchoso</Text>
       </View>
@@ -39,8 +43,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 15,
   },
-  logoIcon: {
-    fontSize: 24,
+  logoImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
   },
   title: {
     fontSize: 32,

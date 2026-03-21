@@ -1,6 +1,8 @@
 import React from 'react';
-import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, Pressable, ScrollView, Linking } from 'react-native';
+import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { affiliateLinks } from '../config/affiliateLinks';
 
 export default function MainMenu() {
   const menuItems = [
@@ -10,7 +12,7 @@ export default function MainMenu() {
       subtitle: 'Curadoria de ofertas',
       icon: '🌐',
       color: '#2EC4B6',
-      action: 'openWebsite'
+      action: 'official_site'
     },
     {
       id: 'club',
@@ -18,7 +20,7 @@ export default function MainMenu() {
       subtitle: 'Assinatura premium',
       icon: '👑',
       color: '#FF9F1C',
-      action: 'openClub'
+      action: 'club'
     },
     {
       id: 'amazon',
@@ -26,7 +28,7 @@ export default function MainMenu() {
       subtitle: 'Ofertas selecionadas',
       icon: '📦',
       color: '#FF9900',
-      action: 'openAmazon'
+      action: 'amazon'
     },
     {
       id: 'temu',
@@ -34,7 +36,7 @@ export default function MainMenu() {
       subtitle: 'Produtos baratos',
       icon: '🛒',
       color: '#E74C3C',
-      action: 'openTemu'
+      action: 'temu'
     },
     {
       id: 'thefork',
@@ -42,7 +44,7 @@ export default function MainMenu() {
       subtitle: 'Restaurantes com desconto',
       icon: '🍽️',
       color: '#27AE60',
-      action: 'openTheFork'
+      action: 'thefork'
     },
     {
       id: 'revolut',
@@ -50,7 +52,7 @@ export default function MainMenu() {
       subtitle: 'Conta bancária',
       icon: '💳',
       color: '#3498DB',
-      action: 'openRevolut'
+      action: 'revolut'
     },
     {
       id: 'wise',
@@ -58,7 +60,7 @@ export default function MainMenu() {
       subtitle: 'Transferências internacionais',
       icon: '🌍',
       color: '#9B59B6',
-      action: 'openWise'
+      action: 'wise'
     },
     {
       id: 'homeexchange',
@@ -66,21 +68,48 @@ export default function MainMenu() {
       subtitle: 'Troca de casas',
       icon: '🏠',
       color: '#E67E22',
-      action: 'openHomeExchange'
+      action: 'homeexchange'
     },
     {
-      id: 'community',
+      id: 'community_telegram',
       title: 'Comunidade',
-      subtitle: 'Telegram & WhatsApp',
+      subtitle: 'Telegram',
       icon: '💬',
       color: '#1ABC9C',
-      action: 'openCommunity'
+      action: 'telegram'
     }
   ];
 
-  const handleMenuAction = (action) => {
-    // Aqui você implementaria as ações específicas
-    console.log(`Ação: ${action}`);
+  const router = useRouter();
+
+  const handleMenuAction = async (action) => {
+    const internalStores = ['amazon', 'temu', 'thefork', 'revolut', 'wise'];
+    
+    if (action === 'official_site') {
+        router.push('/official');
+        return;
+    }
+
+    if (internalStores.includes(action)) {
+        router.push(`/store/${action}`);
+        return;
+    }
+
+    try {
+      if (affiliateLinks[action]) {
+        const url = affiliateLinks[action];
+        const supported = await Linking.canOpenURL(url);
+        if (supported) {
+          await Linking.openURL(url);
+        } else {
+          console.log(`Don't know how to open this URL: ${url}`);
+        }
+      } else {
+        console.log(`Action not found in affiliateLinks: ${action}`);
+      }
+    } catch (error) {
+      console.error('An error occurred', error);
+    }
   };
 
   return (
@@ -127,6 +156,7 @@ const styles = StyleSheet.create({
   menuContainer: {
     flexDirection: 'row',
     paddingHorizontal: 20,
+    paddingBottom: 5,
   },
   menuItem: {
     width: 120,

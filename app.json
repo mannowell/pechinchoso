@@ -29,6 +29,11 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
-    "scheme": "pechinchoso"
+    "scheme": "pechinchoso",
+    "plugins": [
+      "expo-font",
+      "expo-router",
+      "expo-web-browser"
+    ]
   }
 }
