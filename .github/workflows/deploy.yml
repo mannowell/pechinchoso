@@ -14,7 +14,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
       - name: Install dependencies
         run: npm install --legacy-peer-deps
@@ -22,6 +22,7 @@ jobs:
         run: npx expo export --platform web
         env:
           NODE_OPTIONS: "--no-experimental-strip-types"
+          CI: false
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
