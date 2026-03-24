@@ -1,13 +1,13 @@
 // app/index.js
 import React from 'react';
-import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, SafeAreaView, ScrollView, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../components/Header';
 import VoucherScanner from '../components/VoucherScanner';
 import CategoryMenu from '../components/CategoryMenu';
-import MainMenu from '../components/MainMenu';
 import DailyContent from '../components/DailyContent';
 import PromotionsGrid from '../components/PromotionsGrid';
+import SupermarketComparison from '../components/SupermarketComparison';
 
 export default function HomeScreen() {
   return (
@@ -18,11 +18,19 @@ export default function HomeScreen() {
       >
         <ScrollView showsVerticalScrollIndicator={false}>
             <Header />
-            <VoucherScanner />
+            
+            <View style={styles.topSection}>
+                <VoucherScanner />
+                <SupermarketComparison />
+            </View>
+
             <CategoryMenu />
-            <DailyContent />
-            <MainMenu />
-            <PromotionsGrid />
+            
+            <View style={styles.mainSection}>
+                <DailyContent title="Tendências de Hoje 📈" />
+                <PromotionsGrid title="Ofertas Relâmpago em PT 🔥" />
+            </View>
+            
         </ScrollView>
       </LinearGradient>
     </SafeAreaView>
@@ -36,4 +44,10 @@ const styles = StyleSheet.create({
   gradient: {
     flex: 1,
   },
+  topSection: {
+    marginTop: 5,
+  },
+  mainSection: {
+    marginTop: -10,
+  }
 });

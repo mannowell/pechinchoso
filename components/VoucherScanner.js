@@ -1,36 +1,47 @@
 // components/VoucherScanner.js
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Pressable, Alert } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Pressable, Alert, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { getStoreVouchers } from '../services/supermarketService';
 
 export default function VoucherScanner() {
   const [text, setText] = useState('');
   const [parsing, setParsing] = useState(false);
+  const [result, setResult] = useState(null);
 
-  const handleScan = () => {
+  const handleScan = async () => {
     if (!text.trim()) return;
     
     setParsing(true);
+    setResult(null);
     
-    // Simulating an AI/Regex parser
-    setTimeout(() => {
+    // Simulate AI parsing + Search in real voucher DB
+    setTimeout(async () => {
       const lowerText = text.toLowerCase();
-      let detectedStore = "Loja Desconhecida";
-      let discount = "Desconto";
+      let store = "";
       
-      if (lowerText.includes('pingo doce')) detectedStore = "Pingo Doce";
-      else if (lowerText.includes('continente')) detectedStore = "Continente";
-      else if (lowerText.includes('zara')) detectedStore = "Zara";
+      if (lowerText.includes('pingo') || lowerText.includes('doce')) store = "Pingo Doce";
+      else if (lowerText.includes('continente')) store = "Continente";
+      else if (lowerText.includes('lidl')) store = "LIDL";
+      else if (lowerText.includes('auchan')) store = "Auchan";
       
-      const discountMatch = text.match(/(\d+%)|(\d+€)/);
-      if (discountMatch) discount = discountMatch[0];
-
-      Alert.alert(
-        "Promoção Detectada! 🎉",
-        `Loja: ${detectedStore}\nDesconto: ${discount}\n\nO motor Pechinchoso agora vai monitorar esta oferta para você!`,
-        [{ text: "Excelente!", onPress: () => { setText(''); setParsing(false); } }]
-      );
-    }, 1500);
+      const vouchers = await getStoreVouchers(store);
+      
+      if (vouchers.length > 0) {
+          setResult(vouchers[0]);
+          Alert.alert(
+            "Pechincha Identificada! 🎫",
+            `Encontrámos um cupão ativo para ${vouchers[0].store}:\n\n"${vouchers[0].desc}"\n\nCódigo: ${vouchers[0].code}`,
+            [{ text: "Guardar", onPress: () => { setText(''); setParsing(false); } }]
+          );
+      } else {
+          Alert.alert(
+            "Aviso",
+            "Não encontrámos cupões ativos para esta loja no momento, mas a oferta foi enviada para análise!",
+            [{ text: "OK", onPress: () => { setText(''); setParsing(false); } }]
+          );
+      }
+    }, 1200);
   };
 
   return (
@@ -39,14 +50,14 @@ export default function VoucherScanner() {
         colors={['#FFFFFF', '#F9F9F9']}
         style={styles.card}
       >
-        <Text style={styles.title}>Recebeu um SMS de Promoção? 📱</Text>
-        <Text style={styles.subtitle}>Cole o texto abaixo e nossa IA extrai a oferta para a comunidade!</Text>
+        <Text style={styles.title}>Vouchers & SMS 📱</Text>
+        <Text style={styles.subtitle}>Cole aqui o SMS da loja e a nossa IA verifica se o cupão é real e vantajoso!</Text>
         
         <TextInput
           style={styles.input}
-          placeholder="Ex: Pingo Doce: ganhe 20% de desconto em toda a loja..."
+          placeholder="Ex: Continente: cupão 5€ em compras acima de..."
           multiline
-          numberOfLines={3}
+          numberOfLines={2}
           value={text}
           onChangeText={setText}
         />
@@ -59,9 +70,11 @@ export default function VoucherScanner() {
           onPress={handleScan}
           disabled={parsing}
         >
-          <Text style={styles.buttonText}>
-            {parsing ? 'Processando Inteligência...' : 'Analisar Pechincha ✨'}
-          </Text>
+          {parsing ? (
+              <ActivityIndicator color="white" size="small" />
+          ) : (
+              <Text style={styles.buttonText}>Validar Pechincha ✨</Text>
+          )}
         </Pressable>
       </LinearGradient>
     </View>
@@ -69,50 +82,11 @@ export default function VoucherScanner() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 20,
-    marginBottom: 25,
-  },
-  card: {
-    padding: 20,
-    borderRadius: 20,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FF6B35',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 13,
-    color: '#666',
-    marginBottom: 15,
-    lineHeight: 18,
-  },
-  input: {
-    backgroundColor: '#F0F0F0',
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 14,
-    color: '#333',
-    minHeight: 80,
-    textAlignVertical: 'top',
-    marginBottom: 15,
-  },
-  button: {
-    backgroundColor: '#FF6B35',
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 15,
-  },
+  container: { paddingHorizontal: 20, marginBottom: 25 },
+  card: { padding: 18, borderRadius: 20, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 6 },
+  title: { fontSize: 17, fontWeight: 'bold', color: '#FF6B35', marginBottom: 6 },
+  subtitle: { fontSize: 12, color: '#666', marginBottom: 15, lineHeight: 16 },
+  input: { backgroundColor: '#F2F2F2', borderRadius: 12, padding: 10, fontSize: 13, color: '#333', minHeight: 60, textAlignVertical: 'top', marginBottom: 12 },
+  button: { backgroundColor: '#FF6B35', paddingVertical: 12, borderRadius: 12, alignItems: 'center', height: 45, justifyContent: 'center' },
+  buttonText: { color: 'white', fontWeight: 'bold', fontSize: 14 }
 });
